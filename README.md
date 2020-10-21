@@ -10,6 +10,7 @@ $ cp .env.example .env
 $ yarn
 $ yarn build
 $ yarn lint
+$ yarn dev
 ```
 
 ``` bash
