@@ -1,10 +1,8 @@
 import "module-alias/register";
 import "reflect-metadata";
 
-import server from "@config/server";
+import faina from "@config/server";
 
-server.listen(process.env.APP_PORT, () => {
-  console.log(`Servidor inicializado na porta ${process.env.APP_PORT}!`);
-});
+faina.start();
 
-export default server;
+export default faina;
