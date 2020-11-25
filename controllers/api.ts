@@ -1,6 +1,7 @@
-import { Get, Route } from "@config/controller";
+import Controller, { Get, Route } from "@config/controller";
 import { Request, Response } from "express";
 import path from "path";
+import { QueryTypes } from "sequelize";
 
 /**
  * @export
@@ -14,7 +15,7 @@ import path from "path";
  * @extends {ApiController}
  */
 @Route("/")
-export class ApiController {
+export class ApiController extends Controller {
   /**
    * @author Ícaro Tavares
    *
@@ -32,15 +33,19 @@ export class ApiController {
     const {
       name,
       description,
-      version,
       author
     }: any = require(path.join(path.resolve("./"), "package.json"));
+
+    const sql: any = await this.faina().query("SELECT 'true' AS connection", {
+      plain: true,
+      type: QueryTypes.SELECT
+    });
 
     return res.json({
       name: name,
       description: description,
-      version: version,
-      author: author
+      author: author,
+      sql: sql.connection
     });
   }
 }
