@@ -16,14 +16,14 @@ export class FainaServer {
       path: ".env"
     });
 
-    await routing(app);
-
-    app.use(bodyParser.json());
     app.use(bodyParser.urlencoded({ extended: false }));
+    app.use(bodyParser.json());
     app.use(compression());
     app.use(cors());
     app.use(express.static(publicPath));
     app.use(helmet());
+
+    await routing(app);
 
     app.get("*", (_req: express.Request, res: express.Response) => {
       res.sendFile(path.join(publicPath, "index.html"));
