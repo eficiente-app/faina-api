@@ -19,6 +19,10 @@ class Database {
       modelPaths: [
         path.join(__dirname, "../../models")
       ],
+      dialectOptions: {
+        useUTC: true,
+        timezone: "Etc/GMT"
+      },
       define: {
         timestamps: false,
         underscored: true,
