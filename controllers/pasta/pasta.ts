@@ -4,6 +4,14 @@ import { QueryTypes } from "sequelize";
 
 @Route("/api/pasta")
 export class ApiPasta extends Controller {
+
+  @Get("/qualquercoisa")
+  async qq (_req: Request, res: Response): Promise<Response> {
+    return res.json({
+      qualquercoisa: "Ok"
+    });
+  }
+
   @Get("")
   async listar (_req: Request, res: Response): Promise<Response> {
     console.log(_req.body);
