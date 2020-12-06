@@ -32,29 +32,58 @@ export class ApiPasta extends Controller {
   async insert (req: Request, res: Response): Promise<Response> {
     try {
       const param = req.body;
-      const registro: any = await this.faina().query(`
-        INSERT
-          INTO pasta
-             ( tipo
-             , projeto_id
-             , nome
-             , descricao
-             )
-        VALUES
-             ( :tipo
-             , :projetoId
-             , :nome
-             , :descricao
-             )
-        `, {
+      let pasta, pastaPasta;
+      await this.faina().transaction(async (t) => {
+        pasta = await this.faina().query(`
+              /* Inserir a Pasta */
+          INSERT
+            INTO pasta
+               ( tipo
+               , projeto_id
+               , nome
+               , descricao
+               )
+          VALUES
+               ( :tipo
+               , :projetoId
+               , :nome
+               , :descricao
+               );`, {
+          type: QueryTypes.INSERT,
           replacements: {
             tipo: param.tipo,
             projetoId: param.projetoId,
             nome: param.nome,
             descricao: param.descricao
-          }
+          },
+          transaction: t
+        });
+
+        if (param.pastaId) {
+          pastaPasta = await this.faina().query(`
+                /* Inserir o Relacionamento da Pasta com a Pasta Mãe */
+            INSERT
+              INTO pasta_pasta
+                 ( mae_id
+                 , filha_id
+                 , incluido_id
+                 )
+            SELECT pasta.id
+                 , LAST_INSERT_ID()
+                 , ${0}
+              FROM pasta
+             WHERE pasta.id = ${param.pastaId};`, {
+            type: QueryTypes.INSERT,
+            transaction: t
+          });
         }
-      );
+      });
+
+      const registro = {
+        pasta: pasta,
+        pastaPasta: pastaPasta
+      };
+
       return res.json(registro);
     } catch (e) {
       return res.json({sucesso: false, mensagem: e.message, e: e});
@@ -65,16 +94,21 @@ export class ApiPasta extends Controller {
   async alterar (req: Request, res: Response): Promise<Response> {
     try {
       const param = req.body;
-      const registro: any = await this.faina().query(`
-        UPDATE pasta
-           SET tipo        = :tipo
-             , projeto_id  = :projetoId
-             , nome        = :nome
-             , descricao   = :descricao
-             , alterado_id = :alteradoId
-             , alterado_em = :alteradoEm
-         WHERE id = :id
-        `, {
+      let pasta, pastaPasta;
+
+      await this.faina().transaction(async (t) => {
+        pasta = await this.faina().query(`
+              /* Altera informações sobre a pasta */
+          UPDATE pasta
+             SET tipo        = :tipo
+               , projeto_id  = :projetoId
+               , nome        = :nome
+               , descricao   = :descricao
+               , alterado_id = :alteradoId
+               , alterado_em = :alteradoEm
+           WHERE excluido_em IS NULL
+             AND id = :id`, {
+          type: QueryTypes.UPDATE,
           replacements: {
             id: param.id,
             tipo: param.tipo,
@@ -83,12 +117,31 @@ export class ApiPasta extends Controller {
             descricao: param.descricao,
             alteradoId: param.alteradoId,
             alteradoEm: param.alteradoEm
-          }
+          },
+          transaction: t
+        });
+
+        if (param.pastaId && param.pastaIdNovo) {
+          pastaPasta = await this.faina().query(`
+                /* Altera o Relacionamento da Pasta com a Pasta Mãe */
+            UPDATE pasta_pasta
+               SET mae_id  = ${param.pastaIdNovo}
+             WHERE fila_id = ${param.Id}
+               AND mae_id  = ${param.pastaId};`, {
+            type: QueryTypes.UPDATE,
+            transaction: t
+          });
         }
-      );
+      });
+
+      const registro = {
+        pasta: pasta,
+        pastaPasta: pastaPasta
+      };
+
       return res.json(registro);
     } catch (e) {
-      throw new Error(`Falha ao Alterar a Pasta!\n\n` + e.message);
+      return res.json({sucesso: false, mensagem: e.message, e: e});
     }
   }
 
@@ -109,7 +162,7 @@ export class ApiPasta extends Controller {
       );
       return res.json(registro);
     } catch (e) {
-      throw new Error(`Falha ao Incluir a Pasta!\n\n` + e.message);
+      return res.json({sucesso: false, mensagem: e.message, e: e});
     }
   }
 }
