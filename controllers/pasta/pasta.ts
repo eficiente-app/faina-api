@@ -38,20 +38,20 @@ export class ApiPasta extends Controller {
               /* Inserir a Pasta */
           INSERT
             INTO pasta
-               ( tipo
+               ( tipo_id
                , projeto_id
                , nome
                , descricao
                )
           VALUES
-               ( :tipo
+               ( :tipoId
                , :projetoId
                , :nome
                , :descricao
                );`, {
           type: QueryTypes.INSERT,
           replacements: {
-            tipo: param.tipo,
+            tipoId: param.tipo_id,
             projetoId: param.projetoId,
             nome: param.nome,
             descricao: param.descricao
@@ -100,7 +100,7 @@ export class ApiPasta extends Controller {
         pasta = await this.faina().query(`
               /* Altera informações sobre a pasta */
           UPDATE pasta
-             SET tipo        = :tipo
+             SET tipo_id     = :tipoId
                , projeto_id  = :projetoId
                , nome        = :nome
                , descricao   = :descricao
@@ -111,7 +111,7 @@ export class ApiPasta extends Controller {
           type: QueryTypes.UPDATE,
           replacements: {
             id: param.id,
-            tipo: param.tipo,
+            tipoId: param.tipoId,
             projetoId: param.projetoId,
             nome: param.nome,
             descricao: param.descricao,
