@@ -86,7 +86,7 @@ export class ApiTarefaStatus extends Controller {
         UPDATE tarefa_status
            SET excluido_em  = CURRENT_TIMESTAMP()
              , excluido_id  = :userId
-         WHERE id           = ${req.query.id}
+         WHERE id           = ${req.params.id}
            AND excluido_em IS NULL
         `, {
           replacements: {

@@ -86,7 +86,7 @@ export class ApiTarefaEtapaTipo extends Controller {
         UPDATE tarefa_etapa_tipo
            SET excluido_em  = CURRENT_TIMESTAMP()
              , excluido_id  = :userId
-         WHERE id           = ${req.query.id}
+         WHERE id           = ${req.params.id}
            AND excluido_em IS NULL
         `, {
           replacements: {
