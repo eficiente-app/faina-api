@@ -116,7 +116,7 @@ export class ApiPasta extends Controller {
                  , nome        = :nome
                  , descricao   = :descricao
                  , alterado_id = :alteradoId
-                 , alterado_em = :alteradoEm
+                 , alterado_em = current_timestamp()
              WHERE excluido_em IS NULL
                AND id = :id`, {
             type: QueryTypes.UPDATE,
@@ -126,8 +126,7 @@ export class ApiPasta extends Controller {
               projetoId: paramPasta.projetoId,
               nome: paramPasta.nome,
               descricao: paramPasta.descricao,
-              alteradoId: paramPasta.alteradoId,
-              alteradoEm: paramPasta.alteradoEm
+              alteradoId: paramPasta.alteradoId
             },
             transaction: t
           }));

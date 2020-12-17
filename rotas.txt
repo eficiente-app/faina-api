@@ -1,0 +1,116 @@
+/pasta
+  - Inserir
+    {
+      "tipoId": 0,
+      "projetoId": null, // ou inteiro
+      "nome": "",
+      "descricao": "",
+      "pastaId": null, // Opcional, ID da pasta "Mãe"
+      "incluidoId": 0
+    }
+  - Alterar
+    {
+      "id": 0, // obrigatório
+      "tipoId": 2,
+      "projetoId": null, // ou inteiro
+      "nome": "",
+      "descricao": "",
+      "pastaId": null, // Opcional, ID da pasta "Mãe" anterior
+      "pastaIdNovo": null, // Opcional, ID da pasta "Mãe" nova
+      "alteradoId": 0
+    }
+  - Delete
+    /id
+
+pasta/tipo
+  - Inserir
+    {
+      "nome": "",
+      "descricao": "",
+      "incluidoId": 0
+    }
+  - Alterar
+    {
+      "id": 0,
+      "nome": "",
+      "descricao": "",
+      "alteradoId": 0
+    }
+
+tarefa/tipo
+  - Inserir
+    {
+      "nome": "",
+      "descricao": "",
+      "incluidoId": 0
+    }
+  - Alterar
+    {
+      "id": 0,
+      "nome": "",
+      "descricao": "",
+      "alteradoId": 0
+    }
+
+tarefa/classificacao
+  - Inserir
+    {
+      "nome": "",
+      "descricao": "",
+      "incluidoId": 0
+    }
+  - Alterar
+    {
+      "id": 0,
+      "nome": "",
+      "descricao": "",
+      "alteradoId": 0
+    }
+
+tarefa/status
+  - Inserir
+    {
+      "nome": "",
+      "descricao": "",
+      "incluidoId": 0
+    }
+  - Alterar
+    {
+      "id": 0,
+      "nome": "",
+      "descricao": "",
+      "alteradoId": 0
+    }
+
+tarefa/etapa/tipo
+  - Inserir
+    {
+      "nome": "",
+      "descricao": "",
+      "incluidoId": 0
+    }
+  - Alterar
+    {
+      "id": 0,
+      "nome": "",
+      "descricao": "",
+      "alteradoId": 0
+    }
+
+tarefa/etapa/status
+  - Inserir
+    {
+      "nome": "",
+      "descricao": "",
+      "incluidoId": 0
+    }
+  - Alterar
+    {
+      "id": 0,
+      "nome": "",
+      "descricao": "",
+      "alteradoId": 0
+    }
+
+tarefa
+tarefa_etapa

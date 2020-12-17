@@ -61,15 +61,14 @@ export class ApiTarefaTipo extends Controller {
            SET nome        = :nome
              , descricao   = :descricao
              , alterado_id = :alteradoId
-             , alterado_em = :alteradoEm
+             , alterado_em = current_timestamp()
          WHERE id = :id
         `, {
           replacements: {
             id: param.id,
             nome: param.nome,
             descricao: param.descricao,
-            alteradoId: param.alteradoId,
-            alteradoEm: param.alteradoEm
+            alteradoId: param.alteradoId
           }
         }
       );
