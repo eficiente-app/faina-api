@@ -31,13 +31,12 @@ export class ApiPasta extends Controller {
   @Post("")
   async insert (req: Request, res: Response): Promise<Response> {
     try {
-      const parametros = this.toArray(req.body);
-
+      const parametros: Array<any> = this.toArray(req.body);
       const pasta: any[] = [];
       const pastaPasta: any[] = [];
+
       await this.faina().transaction(async (t) => {
-        parametros.forEach(async (paramPasta: any) => {
-          console.log('Ok');
+        for (let i = 0; i < parametros.length; i++) {
           const reg = await this.faina().query(`
                 /* Inserir a Pasta */
             INSERT
@@ -55,17 +54,17 @@ export class ApiPasta extends Controller {
                  );`, {
             type: QueryTypes.INSERT,
             replacements: {
-              tipoId: paramPasta.tipoId,
-              projetoId: paramPasta.projetoId,
-              nome: paramPasta.nome,
-              descricao: paramPasta.descricao
+              tipoId: parametros[i].tipoId,
+              projetoId: parametros[i].projetoId,
+              nome: parametros[i].nome,
+              descricao: parametros[i].descricao
             },
             transaction: t
           });
-          pasta.push(reg);
 
-          if (paramPasta.pastaId) {
-            console.log('Ok');
+          pasta.push(reg[0]);
+
+          if (parametros[i].pastaId) {
             const regPasta = await this.faina().query(`
                   /* Inserir o Relacionamento da Pasta com a Pasta Mãe */
               INSERT
@@ -78,22 +77,17 @@ export class ApiPasta extends Controller {
                    , LAST_INSERT_ID()
                    , ${0}
                 FROM pasta
-               WHERE pasta.id = ${paramPasta.pastaId};`, {
+               WHERE pasta.id = ${parametros[i].pastaId};`, {
               type: QueryTypes.INSERT,
               transaction: t
             });
 
-            pastaPasta.push(regPasta);
+            pastaPasta.push(regPasta[0]);
           }
-        });
-    });
+        }
+      });
 
-      const registro = {
-        pasta: pasta,
-        pastaPasta: pastaPasta
-      };
-
-      return res.json(registro);
+      return res.json({ pasta, pastaPasta });
     } catch (e) {
       return res.json({sucesso: false, mensagem: e.message, e: e});
     }
@@ -102,12 +96,12 @@ export class ApiPasta extends Controller {
   @Put("")
   async alterar (req: Request, res: Response): Promise<Response> {
     try {
-      const parametros = this.toArray(req.body);
+      const parametros: Array<any> = this.toArray(req.body);
       const pasta: any[] = [];
       const pastaPasta: any[] = [];
 
       await this.faina().transaction(async (t) => {
-        parametros.forEach(async (paramPasta: any) => {
+        for (let i = 0; i < parametros.length; i++) {
           pasta.push(await this.faina().query(`
                 /* Altera informações sobre a pasta */
             UPDATE pasta
@@ -121,37 +115,32 @@ export class ApiPasta extends Controller {
                AND id = :id`, {
             type: QueryTypes.UPDATE,
             replacements: {
-              id: paramPasta.id,
-              tipoId: paramPasta.tipoId,
-              projetoId: paramPasta.projetoId,
-              nome: paramPasta.nome,
-              descricao: paramPasta.descricao,
-              alteradoId: paramPasta.alteradoId,
-              alteradoEm: paramPasta.alteradoEm
+              id: parametros[i].id,
+              tipoId: parametros[i].tipoId,
+              projetoId: parametros[i].projetoId,
+              nome: parametros[i].nome,
+              descricao: parametros[i].descricao,
+              alteradoId: parametros[i].alteradoId,
+              alteradoEm: parametros[i].alteradoEm
             },
             transaction: t
           }));
 
-          if (paramPasta.pastaId && paramPasta.pastaIdNovo) {
+          if (parametros[i].pastaId && parametros[i].pastaIdNovo) {
             pastaPasta.push(await this.faina().query(`
                   /* Altera o Relacionamento da Pasta com a Pasta Mãe */
               UPDATE pasta_pasta
-                 SET mae_id  = ${paramPasta.pastaIdNovo}
-               WHERE fila_id = ${paramPasta.Id}
-                 AND mae_id  = ${paramPasta.pastaId};`, {
+                 SET mae_id  = ${parametros[i].pastaIdNovo}
+               WHERE filha_id = ${parametros[i].id}
+                 AND mae_id  = ${parametros[i].pastaId};`, {
               type: QueryTypes.UPDATE,
               transaction: t
             }));
           }
-        });
+        }
       });
 
-      const registro = {
-        pasta: pasta,
-        pastaPasta: pastaPasta
-      };
-
-      return res.json(registro);
+      return res.json({ pasta, pastaPasta });
     } catch (e) {
       return res.json({sucesso: false, mensagem: e.message, e: e});
     }
