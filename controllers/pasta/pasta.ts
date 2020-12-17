@@ -31,62 +31,53 @@ export class ApiPasta extends Controller {
   @Post("")
   async insert (req: Request, res: Response): Promise<Response> {
     try {
-      const parametros = this.toArray(req.body);
-
-      const pasta: any[] = [];
-      const pastaPasta: any[] = [];
+      const param = req.body;
+      let pasta, pastaPasta;
       await this.faina().transaction(async (t) => {
-        parametros.forEach(async (paramPasta: any) => {
-          console.log('Ok');
-          const reg = await this.faina().query(`
-                /* Inserir a Pasta */
+        pasta = await this.faina().query(`
+              /* Inserir a Pasta */
+          INSERT
+            INTO pasta
+               ( tipo_id
+               , projeto_id
+               , nome
+               , descricao
+               )
+          VALUES
+               ( :tipoId
+               , :projetoId
+               , :nome
+               , :descricao
+               );`, {
+          type: QueryTypes.INSERT,
+          replacements: {
+            tipoId: param.tipo_id,
+            projetoId: param.projetoId,
+            nome: param.nome,
+            descricao: param.descricao
+          },
+          transaction: t
+        });
+
+        if (param.pastaId) {
+          pastaPasta = await this.faina().query(`
+                /* Inserir o Relacionamento da Pasta com a Pasta Mãe */
             INSERT
-              INTO pasta
-                 ( tipo_id
-                 , projeto_id
-                 , nome
-                 , descricao
+              INTO pasta_pasta
+                 ( mae_id
+                 , filha_id
+                 , incluido_id
                  )
-            VALUES
-                 ( :tipoId
-                 , :projetoId
-                 , :nome
-                 , :descricao
-                 );`, {
+            SELECT pasta.id
+                 , LAST_INSERT_ID()
+                 , ${0}
+              FROM pasta
+             WHERE pasta.id = ${param.pastaId};`, {
             type: QueryTypes.INSERT,
-            replacements: {
-              tipoId: paramPasta.tipoId,
-              projetoId: paramPasta.projetoId,
-              nome: paramPasta.nome,
-              descricao: paramPasta.descricao
-            },
             transaction: t
           });
-          pasta.push(reg);
-
-          if (paramPasta.pastaId) {
-            console.log('Ok');
-            const regPasta = await this.faina().query(`
-                  /* Inserir o Relacionamento da Pasta com a Pasta Mãe */
-              INSERT
-                INTO pasta_pasta
-                   ( mae_id
-                   , filha_id
-                   , incluido_id
-                   )
-              SELECT pasta.id
-                   , LAST_INSERT_ID()
-                   , ${0}
-                FROM pasta
-               WHERE pasta.id = ${paramPasta.pastaId};`, {
-              type: QueryTypes.INSERT,
-              transaction: t
-            });
-
-            pastaPasta.push(regPasta);
-          }
-        });
-    });
+        }
+      });
 
       const registro = {
         pasta: pasta,
@@ -102,47 +93,44 @@ export class ApiPasta extends Controller {
   @Put("")
   async alterar (req: Request, res: Response): Promise<Response> {
     try {
-      const parametros = this.toArray(req.body);
-      const pasta: any[] = [];
-      const pastaPasta: any[] = [];
+      const param = req.body;
+      let pasta, pastaPasta;
 
       await this.faina().transaction(async (t) => {
-        parametros.forEach(async (paramPasta: any) => {
-          pasta.push(await this.faina().query(`
-                /* Altera informações sobre a pasta */
-            UPDATE pasta
-               SET tipo_id     = :tipoId
-                 , projeto_id  = :projetoId
-                 , nome        = :nome
-                 , descricao   = :descricao
-                 , alterado_id = :alteradoId
-                 , alterado_em = current_timestamp()
-             WHERE excluido_em IS NULL
-               AND id = :id`, {
-            type: QueryTypes.UPDATE,
-            replacements: {
-              id: paramPasta.id,
-              tipoId: paramPasta.tipoId,
-              projetoId: paramPasta.projetoId,
-              nome: paramPasta.nome,
-              descricao: paramPasta.descricao,
-              alteradoId: paramPasta.alteradoId
-            },
-            transaction: t
-          }));
-
-          if (paramPasta.pastaId && paramPasta.pastaIdNovo) {
-            pastaPasta.push(await this.faina().query(`
-                  /* Altera o Relacionamento da Pasta com a Pasta Mãe */
-              UPDATE pasta_pasta
-                 SET mae_id  = ${paramPasta.pastaIdNovo}
-               WHERE fila_id = ${paramPasta.Id}
-                 AND mae_id  = ${paramPasta.pastaId};`, {
-              type: QueryTypes.UPDATE,
-              transaction: t
-            }));
-          }
+        pasta = await this.faina().query(`
+              /* Altera informações sobre a pasta */
+          UPDATE pasta
+             SET tipo_id     = :tipoId
+               , projeto_id  = :projetoId
+               , nome        = :nome
+               , descricao   = :descricao
+               , alterado_id = :alteradoId
+               , alterado_em = CURRENT_TIMESTAMP()
+           WHERE excluido_em IS NULL
+             AND id = :id`, {
+          type: QueryTypes.UPDATE,
+          replacements: {
+            id: param.id,
+            tipoId: param.tipoId,
+            projetoId: param.projetoId,
+            nome: param.nome,
+            descricao: param.descricao,
+            alteradoId: param.alteradoId
+          },
+          transaction: t
         });
+
+        if (param.pastaId && param.pastaIdNovo) {
+          pastaPasta = await this.faina().query(`
+                /* Altera o Relacionamento da Pasta com a Pasta Mãe */
+            UPDATE pasta_pasta
+               SET mae_id  = ${param.pastaIdNovo}
+             WHERE fila_id = ${param.Id}
+               AND mae_id  = ${param.pastaId};`, {
+            type: QueryTypes.UPDATE,
+            transaction: t
+          });
+        }
       });
 
       const registro = {
