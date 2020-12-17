@@ -26,6 +26,13 @@ export abstract class Controller {
 
     return this.database.instance;
   }
+
+  public toArray (param: any): Object[] {
+    if (!Array.isArray(param)) {
+      param = [param];
+    }
+    return param;
+  }
 }
 
 export default Controller;

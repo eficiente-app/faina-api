@@ -2,7 +2,7 @@ import Controller, { Delete, Get, Post, Put, Route } from "@config/controller";
 import { Request, Response } from "express";
 import { QueryTypes } from "sequelize";
 
-@Route("/api/pasta")
+@Route("/api/tarefa")
 export class ApiPasta extends Controller {
 
   @Get("/qualquercoisa")
@@ -31,57 +31,68 @@ export class ApiPasta extends Controller {
   @Post("")
   async insert (req: Request, res: Response): Promise<Response> {
     try {
-      const param = req.body;
-      let pasta, pastaPasta;
-      await this.faina().transaction(async (t) => {
-        pasta = await this.faina().query(`
-              /* Inserir a Pasta */
-          INSERT
-            INTO pasta
-               ( tipo
-               , projeto_id
-               , nome
-               , descricao
-               )
-          VALUES
-               ( :tipo
-               , :projetoId
-               , :nome
-               , :descricao
-               );`, {
-          type: QueryTypes.INSERT,
-          replacements: {
-            tipo: param.tipo,
-            projetoId: param.projetoId,
-            nome: param.nome,
-            descricao: param.descricao
-          },
-          transaction: t
-        });
+      const parametros = this.toArray(req.body);
 
-        if (param.pastaId) {
-          pastaPasta = await this.faina().query(`
-                /* Inserir o Relacionamento da Pasta com a Pasta Mãe */
+      const tarefa: any[] = [];
+      const pastaTarefa: any[] = [];
+      await this.faina().transaction(async (t) => {
+        parametros.forEach( async (paramTarefa: any) => {
+
+          tarefa.push(await this.faina().query(`
+                /* Inserir a Pasta */
             INSERT
-              INTO pasta_pasta
-                 ( mae_id
-                 , filha_id
+              INTO tarefa
+                 ( tipo_id
+                 , classificacao_id
+                 , status_id
+                 , nome
+                 , conteudo
+                 , tarefa_id
                  , incluido_id
                  )
-            SELECT pasta.id
-                 , LAST_INSERT_ID()
-                 , ${0}
-              FROM pasta
-             WHERE pasta.id = ${param.pastaId};`, {
+            VALUES
+                 ( :tipoId
+                 , :classificacaoId
+                 , :statusId
+                 , :nome
+                 , :conteudo
+                 , :tarefaId
+                 , :incluidoId
+                 );`, {
             type: QueryTypes.INSERT,
+            replacements: {
+              tipoId: paramTarefa.tipoId,
+              projetoId: paramTarefa.projetoId,
+              nome: paramTarefa.nome,
+              descricao: paramTarefa.descricao
+            },
             transaction: t
-          });
-        }
+          }));
+
+          if (paramTarefa.pastaId) {
+            pastaTarefa.push(await this.faina().query(`
+                  /* Inserir o Relacionamento da Pasta com a Pasta Mãe */
+              INSERT
+                INTO pasta_tarefa
+                   ( pasta_id
+                   , tarefa_id
+                   , incluido_id
+                   )
+              SELECT pasta.id
+                   , LAST_INSERT_ID()
+                   , ${0}
+                FROM pasta
+               WHERE pasta.id = ${paramTarefa.pastaId};`, {
+              type: QueryTypes.INSERT,
+              transaction: t
+            }));
+          }
+        });
       });
 
       const registro = {
-        pasta: pasta,
-        pastaPasta: pastaPasta
+        tarefa: tarefa,
+        pastaTarefa: pastaTarefa
       };
 
       return res.json(registro);
