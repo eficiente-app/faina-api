@@ -5,40 +5,38 @@ import { QueryTypes } from "sequelize";
 @Route("/api/pasta")
 export class ApiPasta extends Controller {
 
-  @Get("/qualquercoisa")
-  async qq (_req: Request, res: Response): Promise<Response> {
-    return res.json({
-      qualquercoisa: "Ok"
-    });
-  }
-
   @Get("")
   async listar (_req: Request, res: Response): Promise<Response> {
-    console.log(_req.body);
-    const sql: any = await this.faina().query(`
+    try {
+      const sql: any = await this.faina().query(`
         SELECT *
           FROM pasta
          WHERE pasta.excluido_em IS NULL
-    `, {
-      type: QueryTypes.SELECT
-    });
+      `, {
+        type: QueryTypes.SELECT
+      });
 
-    return res.json({
-      sql: sql
-    });
+      return res.json({ sql });
+    } catch (e) {
+      return res.json({
+        sucesso: false,
+        mensagem: e.message,
+        e
+      });
+    }
   }
 
   @Post("")
   async insert (req: Request, res: Response): Promise<Response> {
     try {
       const parametros: Array<any> = this.toArray(req.body);
-      const pasta: any[] = [];
-      const pastaPasta: any[] = [];
+      const pasta: Array<any> = [];
+      const pastaPasta: Array<any> = [];
 
       await this.faina().transaction(async (t) => {
         for (let i = 0; i < parametros.length; i++) {
-          const reg = await this.faina().query(`
-                /* Inserir a Pasta */
+          const registro = await this.faina().query(`
+            /* Inserir a Pasta */
             INSERT
               INTO pasta
                  ( tipo_id
@@ -52,21 +50,21 @@ export class ApiPasta extends Controller {
                  , :nome
                  , :descricao
                  );`, {
-            type: QueryTypes.INSERT,
             replacements: {
               tipoId: parametros[i].tipoId,
               projetoId: parametros[i].projetoId,
               nome: parametros[i].nome,
               descricao: parametros[i].descricao
             },
-            transaction: t
+            transaction: t,
+            type: QueryTypes.INSERT
           });
 
-          pasta.push(reg[0]);
+          pasta.push(registro[0]);
 
           if (parametros[i].pastaId) {
-            const regPasta = await this.faina().query(`
-                  /* Inserir o Relacionamento da Pasta com a Pasta Mãe */
+            const registroPasta = await this.faina().query(`
+              /* Inserir o Relacionamento da Pasta com a Pasta Mãe */
               INSERT
                 INTO pasta_pasta
                    ( mae_id
@@ -77,19 +75,27 @@ export class ApiPasta extends Controller {
                    , LAST_INSERT_ID()
                    , ${0}
                 FROM pasta
-               WHERE pasta.id = ${parametros[i].pastaId};`, {
-              type: QueryTypes.INSERT,
-              transaction: t
+               WHERE pasta.id = ${parametros[i].pastaId};
+            `, {
+              transaction: t,
+              type: QueryTypes.INSERT
             });
 
-            pastaPasta.push(regPasta[0]);
+            pastaPasta.push(registroPasta[0]);
           }
         }
       });
 
-      return res.json({ pasta, pastaPasta });
+      return res.json({
+        pasta,
+        pastaPasta
+      });
     } catch (e) {
-      return res.json({sucesso: false, mensagem: e.message, e: e});
+      return res.json({
+        sucesso: false,
+        mensagem: e.message,
+        e
+      });
     }
   }
 
@@ -97,13 +103,13 @@ export class ApiPasta extends Controller {
   async alterar (req: Request, res: Response): Promise<Response> {
     try {
       const parametros: Array<any> = this.toArray(req.body);
-      const pasta: any[] = [];
-      const pastaPasta: any[] = [];
+      const pasta: Array<any> = [];
+      const pastaPasta: Array<any> = [];
 
       await this.faina().transaction(async (t) => {
         for (let i = 0; i < parametros.length; i++) {
-          pasta.push(await this.faina().query(`
-                /* Altera informações sobre a pasta */
+          const registro = await this.faina().query(`
+            /* Altera informações sobre a pasta */
             UPDATE pasta
                SET tipo_id     = :tipoId
                  , projeto_id  = :projetoId
@@ -113,7 +119,6 @@ export class ApiPasta extends Controller {
                  , alterado_em = :alteradoEm
              WHERE excluido_em IS NULL
                AND id = :id`, {
-            type: QueryTypes.UPDATE,
             replacements: {
               id: parametros[i].id,
               tipoId: parametros[i].tipoId,
@@ -123,11 +128,14 @@ export class ApiPasta extends Controller {
               alteradoId: parametros[i].alteradoId,
               alteradoEm: parametros[i].alteradoEm
             },
-            transaction: t
-          }));
+            transaction: t,
+            type: QueryTypes.UPDATE
+          });
+
+          pasta.push(registro[1]);
 
           if (parametros[i].pastaId && parametros[i].pastaIdNovo) {
-            pastaPasta.push(await this.faina().query(`
+            const registroPasta = await this.faina().query(`
                   /* Altera o Relacionamento da Pasta com a Pasta Mãe */
               UPDATE pasta_pasta
                  SET mae_id  = ${parametros[i].pastaIdNovo}
@@ -135,14 +143,23 @@ export class ApiPasta extends Controller {
                  AND mae_id  = ${parametros[i].pastaId};`, {
               type: QueryTypes.UPDATE,
               transaction: t
-            }));
+            });
+
+            pastaPasta.push(registroPasta[1]);
           }
         }
       });
 
-      return res.json({ pasta, pastaPasta });
+      return res.json({
+        pasta,
+        pastaPasta
+      });
     } catch (e) {
-      return res.json({sucesso: false, mensagem: e.message, e: e});
+      return res.json({
+        sucesso: false,
+        mensagem: e.message,
+        e
+      });
     }
   }
 
@@ -155,15 +172,20 @@ export class ApiPasta extends Controller {
              , excluido_id  = :userId
          WHERE id           = ${req.params.id}
            AND excluido_em IS NULL
-        `, {
-          replacements: {
-            userId: 0
-          }
-        }
-      );
-      return res.json(registro);
+      `, {
+        replacements: {
+          userId: 0
+        },
+        type: QueryTypes.UPDATE
+      });
+
+      return res.json(registro[1]);
     } catch (e) {
-      return res.json({sucesso: false, mensagem: e.message, e: e});
+      return res.json({
+        sucesso: false,
+        mensagem: e.message,
+        e
+      });
     }
   }
 }
