@@ -5,7 +5,7 @@ import { QueryTypes } from "sequelize";
 @Route("/api/tarefa")
 export class ApiTarefa extends Controller {
 
-  @Get("")
+  @Get("/:id?")
   async listar (_req: Request, res: Response): Promise<Response> {
     try {
       const sql: any = await this.faina().query(`

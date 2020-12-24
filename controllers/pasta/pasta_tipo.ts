@@ -5,18 +5,21 @@ import { QueryTypes } from "sequelize";
 @Route("/api/pasta/tipo")
 export class ApiPastaTipo extends Controller {
 
-  @Get("")
-  async listar (_req: Request, res: Response): Promise<Response> {
+  @Get("/:id?")
+  async listar (req: Request, res: Response): Promise<Response> {
     try {
-      const sql: any = await this.faina().query(`
-          SELECT *
-            FROM pasta_tipo
-           WHERE pasta_tipo.excluido_em IS NULL
-      `, {
+      let sql = `
+        SELECT *
+          FROM pasta_tipo
+         WHERE pasta_tipo.excluido_em IS NULL`;
+      if(req.params.id){
+        sql += `\n AND pasta_tipo.id =${req.params.id}`;
+      }
+      const registros: any = await this.faina().query(sql, {
         type: QueryTypes.SELECT
       });
 
-      return res.json({ sql });
+      return res.json(registros);
     } catch (e) {
       return res.json({
         sucesso: false,
