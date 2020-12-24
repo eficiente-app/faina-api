@@ -6,17 +6,23 @@ import { QueryTypes } from "sequelize";
 export class ApiTarefa extends Controller {
 
   @Get("/:id?")
-  async listar (_req: Request, res: Response): Promise<Response> {
+  async listar (req: Request, res: Response): Promise<Response> {
     try {
-      const sql: any = await this.faina().query(`
-          SELECT *
-            FROM tarefa
-           WHERE tarefa.excluido_em IS NULL
-      `, {
+      let sql = `
+        SELECT *
+          FROM tarefa
+         WHERE tarefa.excluido_em IS NULL
+      `;
+
+      if (req.params.id) {
+        sql += `\n AND tarefa.id = ${req.params.id}`;
+      }
+
+      const registros: any = await this.faina().query(sql, {
         type: QueryTypes.SELECT
       });
 
-      return res.json({ sql });
+      return res.json(registros);
     } catch (e) {
       return res.json({
         sucesso: false,

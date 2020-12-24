@@ -12,7 +12,7 @@ export class ApiPastaTipo extends Controller {
         SELECT *
           FROM pasta_tipo
          WHERE pasta_tipo.excluido_em IS NULL`;
-      if(req.params.id){
+      if (req.params.id) {
         sql += `\n AND pasta_tipo.id =${req.params.id}`;
       }
       const registros: any = await this.faina().query(sql, {

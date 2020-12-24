@@ -14,7 +14,7 @@ export class ApiPasta extends Controller {
          WHERE pasta.excluido_em IS NULL
       `;
 
-      if(req.params.id){
+      if (req.params.id) {
         sql += `\n AND pasta.id =${req.params.id}`;
       }
 
