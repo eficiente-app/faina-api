@@ -1,6 +1,8 @@
 import Database from "@config/database";
+import validate from "@config/validate";
 import { All, Delete, Get, Head, Options, Patch, Post, Put } from "@config/decorators/request";
 import Route from "@config/decorators/route";
+import { QueryTypes } from "sequelize";
 
 export {
   All,
@@ -27,10 +29,27 @@ export abstract class Controller {
     return this.database.instance;
   }
 
+  protected rules (params: any): Promise<any> {
+    return params.reduce((obj: any, key: any) => ({
+      ...obj,
+      [key]: (<any>validate)[key]
+    }), {});
+  }
+
+  protected async select (sql: string, opcoes: any = { }): Promise<any> {
+    const query = await this.select(sql, {
+      type: QueryTypes.SELECT,
+      ...opcoes
+    });
+
+    return query;
+  }
+
   public toArray (param: any): Object[] {
     if (!Array.isArray(param)) {
       param = [param];
     }
+
     return param;
   }
 }

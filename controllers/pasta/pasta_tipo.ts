@@ -15,7 +15,7 @@ export class ApiPastaTipo extends Controller {
       if (req.params.id) {
         sql += `\n AND pasta_tipo.id =${req.params.id}`;
       }
-      const registros: any = await this.faina().query(sql, {
+      const registros: any = await this.select(sql, {
         type: QueryTypes.SELECT
       });
 
@@ -23,8 +23,7 @@ export class ApiPastaTipo extends Controller {
     } catch (e) {
       return res.json({
         sucesso: false,
-        mensagem: e.message,
-        e
+        mensagem: e.message
       });
     }
   }
@@ -37,7 +36,7 @@ export class ApiPastaTipo extends Controller {
 
       await this.faina().transaction(async (t) => {
         for (let i = 0; i < parametros.length; i++) {
-          const registro: any = await this.faina().query(`
+          const registro: any = await this.select(`
             INSERT
               INTO pasta_tipo
                 ( nome
@@ -64,8 +63,7 @@ export class ApiPastaTipo extends Controller {
     } catch (e) {
       return res.json({
         sucesso: false,
-        mensagem: e.message,
-        e
+        mensagem: e.message
       });
     }
   }
@@ -78,7 +76,7 @@ export class ApiPastaTipo extends Controller {
 
       await this.faina().transaction(async (t) => {
         for (let i = 0; i < parametros.length; i++) {
-          const registro: any = await this.faina().query(`
+          const registro: any = await this.select(`
             UPDATE pasta_tipo
                SET nome        = :nome
                  , descricao   = :descricao
@@ -105,8 +103,7 @@ export class ApiPastaTipo extends Controller {
     } catch (e) {
       return res.json({
         sucesso: false,
-        mensagem: e.message,
-        e
+        mensagem: e.message
       });
     }
   }
@@ -114,7 +111,7 @@ export class ApiPastaTipo extends Controller {
   @Delete("/:id")
   async excluir (req: Request, res: Response): Promise<Response> {
     try {
-      const registro: any = await this.faina().query(`
+      const registro: any = await this.select(`
         UPDATE pasta_tipo
            SET excluido_em  = CURRENT_TIMESTAMP()
              , excluido_id  = :userId
@@ -131,8 +128,7 @@ export class ApiPastaTipo extends Controller {
     } catch (e) {
       return res.json({
         sucesso: false,
-        mensagem: e.message,
-        e
+        mensagem: e.message
       });
     }
   }

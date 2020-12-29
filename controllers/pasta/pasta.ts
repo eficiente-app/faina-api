@@ -18,7 +18,7 @@ export class ApiPasta extends Controller {
         sql += `\n AND pasta.id =${req.params.id}`;
       }
 
-      const registros: any = await this.faina().query(sql, {
+      const registros: any = await this.select(sql, {
         type: QueryTypes.SELECT
       });
 
@@ -26,8 +26,7 @@ export class ApiPasta extends Controller {
     } catch (e) {
       return res.json({
         sucesso: false,
-        mensagem: e.message,
-        e
+        mensagem: e.message
       });
     }
   }
@@ -41,7 +40,7 @@ export class ApiPasta extends Controller {
 
       await this.faina().transaction(async (t) => {
         for (let i = 0; i < parametros.length; i++) {
-          const registro = await this.faina().query(`
+          const registro = await this.select(`
             /* Inserir a Pasta */
             INSERT
               INTO pasta
@@ -69,7 +68,7 @@ export class ApiPasta extends Controller {
           pasta.push(registro[0]);
 
           if (parametros[i].pastaId) {
-            const registroPasta = await this.faina().query(`
+            const registroPasta = await this.select(`
               /* Inserir o Relacionamento da Pasta com a Pasta Mãe */
               INSERT
                 INTO pasta_pasta
@@ -99,8 +98,7 @@ export class ApiPasta extends Controller {
     } catch (e) {
       return res.json({
         sucesso: false,
-        mensagem: e.message,
-        e
+        mensagem: e.message
       });
     }
   }
@@ -114,7 +112,7 @@ export class ApiPasta extends Controller {
 
       await this.faina().transaction(async (t) => {
         for (let i = 0; i < parametros.length; i++) {
-          const registro = await this.faina().query(`
+          const registro = await this.select(`
             /* Altera informações sobre a pasta */
             UPDATE pasta
                SET tipo_id     = :tipoId
@@ -141,7 +139,7 @@ export class ApiPasta extends Controller {
           pasta.push(registro[1]);
 
           if (parametros[i].pastaId && parametros[i].pastaIdNovo) {
-            const registroPasta = await this.faina().query(`
+            const registroPasta = await this.select(`
                   /* Altera o Relacionamento da Pasta com a Pasta Mãe */
               UPDATE pasta_pasta
                  SET mae_id  = ${parametros[i].pastaIdNovo}
@@ -163,8 +161,7 @@ export class ApiPasta extends Controller {
     } catch (e) {
       return res.json({
         sucesso: false,
-        mensagem: e.message,
-        e
+        mensagem: e.message
       });
     }
   }
@@ -172,7 +169,7 @@ export class ApiPasta extends Controller {
   @Delete("/:id")
   async excluir (req: Request, res: Response): Promise<Response> {
     try {
-      const registro: any = await this.faina().query(`
+      const registro: any = await this.select(`
         UPDATE pasta
            SET excluido_em  = CURRENT_TIMESTAMP()
              , excluido_id  = :userId
@@ -189,8 +186,7 @@ export class ApiPasta extends Controller {
     } catch (e) {
       return res.json({
         sucesso: false,
-        mensagem: e.message,
-        e
+        mensagem: e.message
       });
     }
   }

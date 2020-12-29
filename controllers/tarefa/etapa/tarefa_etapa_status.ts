@@ -18,7 +18,7 @@ export class ApiTarefaEtapaStatus extends Controller {
         sql += `\n AND tarefa_etapa_status.id = ${req.params.id}`;
       }
 
-      const registros: any = await this.faina().query(sql, {
+      const registros: any = await this.select(sql, {
         type: QueryTypes.SELECT
       });
 
@@ -26,8 +26,7 @@ export class ApiTarefaEtapaStatus extends Controller {
     } catch (e) {
       return res.json({
         sucesso: false,
-        mensagem: e.message,
-        e
+        mensagem: e.message
       });
     }
   }
@@ -40,7 +39,7 @@ export class ApiTarefaEtapaStatus extends Controller {
 
       await this.faina().transaction(async (t) => {
         for (let i = 0; i < parametros.length; i++) {
-          const registro: any = await this.faina().query(`
+          const registro: any = await this.select(`
             INSERT
               INTO tarefa_etapa_status
                 ( nome
@@ -67,8 +66,7 @@ export class ApiTarefaEtapaStatus extends Controller {
     } catch (e) {
       return res.json({
         sucesso: false,
-        mensagem: e.message,
-        e
+        mensagem: e.message
       });
     }
   }
@@ -81,7 +79,7 @@ export class ApiTarefaEtapaStatus extends Controller {
 
       await this.faina().transaction(async (t) => {
         for (let i = 0; i < parametros.length; i++) {
-          const registro: any = await this.faina().query(`
+          const registro: any = await this.select(`
             UPDATE tarefa_etapa_status
               SET nome        = :nome
                 , descricao   = :descricao
@@ -108,8 +106,7 @@ export class ApiTarefaEtapaStatus extends Controller {
     } catch (e) {
       return res.json({
         sucesso: false,
-        mensagem: e.message,
-        e
+        mensagem: e.message
       });
     }
   }
@@ -117,7 +114,7 @@ export class ApiTarefaEtapaStatus extends Controller {
   @Delete("/:id")
   async excluir (req: Request, res: Response): Promise<Response> {
     try {
-      const registro: any = await this.faina().query(`
+      const registro: any = await this.select(`
         UPDATE tarefa_etapa_status
            SET excluido_em  = CURRENT_TIMESTAMP()
              , excluido_id  = :userId
@@ -134,8 +131,7 @@ export class ApiTarefaEtapaStatus extends Controller {
     } catch (e) {
       return res.json({
         sucesso: false,
-        mensagem: e.message,
-        e
+        mensagem: e.message
       });
     }
   }

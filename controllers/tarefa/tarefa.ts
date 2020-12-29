@@ -18,7 +18,7 @@ export class ApiTarefa extends Controller {
         sql += `\n AND tarefa.id = ${req.params.id}`;
       }
 
-      const registros: any = await this.faina().query(sql, {
+      const registros: any = await this.select(sql, {
         type: QueryTypes.SELECT
       });
 
@@ -26,8 +26,7 @@ export class ApiTarefa extends Controller {
     } catch (e) {
       return res.json({
         sucesso: false,
-        mensagem: e.message,
-        e
+        mensagem: e.message
       });
     }
   }
@@ -41,7 +40,7 @@ export class ApiTarefa extends Controller {
 
       await this.faina().transaction(async (t) => {
         for (let i = 0; i < parametros.length; i++) {
-          const registroTarefa = await this.faina().query(`
+          const registroTarefa = await this.select(`
             /* Inserir a Tarega */
             INSERT
               INTO tarefa
@@ -76,7 +75,7 @@ export class ApiTarefa extends Controller {
           tarefa.push(registroTarefa[0]);
 
           if (parametros[i].pastaId) {
-            const registroPastaTarega = await this.faina().query(`
+            const registroPastaTarega = await this.select(`
               /* Inserir o Relacionamento da Tarefa com a Pasta Tarefa */
               INSERT
                 INTO pasta_tarefa
@@ -106,8 +105,7 @@ export class ApiTarefa extends Controller {
     } catch (e) {
       return res.json({
         sucesso: false,
-        mensagem: e.message,
-        e
+        mensagem: e.message
       });
     }
   }
@@ -121,7 +119,7 @@ export class ApiTarefa extends Controller {
 
       await this.faina().transaction(async (t) => {
         for (let i = 0; i < parametros.length; i++) {
-          const registroTarefa = await this.faina().query(`
+          const registroTarefa = await this.select(`
             /* Altera informações sobre a tarega */
             UPDATE pasta
               SET tipo        = :tipo
@@ -149,7 +147,7 @@ export class ApiTarefa extends Controller {
           tarefa.push(registroTarefa[1]);
 
           if (parametros[i].pastaId && parametros[i].pastaIdNovo) {
-            const registroPastaTarefa = await this.faina().query(`
+            const registroPastaTarefa = await this.select(`
               /* Altera o Relacionamento da Tarega com a Pasta Tarefa */
               UPDATE pasta_pasta
                 SET mae_id  = ${parametros[i].pastaIdNovo}
@@ -172,8 +170,7 @@ export class ApiTarefa extends Controller {
     } catch (e) {
       return res.json({
         sucesso: false,
-        mensagem: e.message,
-        e
+        mensagem: e.message
       });
     }
   }
@@ -181,7 +178,7 @@ export class ApiTarefa extends Controller {
   @Delete("/:id")
   async excluir (req: Request, res: Response): Promise<Response> {
     try {
-      const registro: any = await this.faina().query(`
+      const registro: any = await this.select(`
         UPDATE pasta
            SET excluido_em  = CURRENT_TIMESTAMP()
              , excluido_id  = :userId
@@ -198,8 +195,7 @@ export class ApiTarefa extends Controller {
     } catch (e) {
       return res.json({
         sucesso: false,
-        mensagem: e.message,
-        e
+        mensagem: e.message
       });
     }
   }

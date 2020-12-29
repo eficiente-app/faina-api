@@ -36,7 +36,7 @@ export class ApiController extends Controller {
       author
     }: any = require(path.join(path.resolve("./"), "package.json"));
 
-    const sql: any = await this.faina().query("SELECT 'true' AS connection", {
+    const sql: any = await this.select("SELECT 'true' AS connection", {
       plain: true,
       type: QueryTypes.SELECT
     });
