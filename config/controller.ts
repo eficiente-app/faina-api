@@ -37,7 +37,7 @@ export abstract class Controller {
   }
 
   protected async select (sql: string, opcoes: any = { }): Promise<any> {
-    const query = await this.select(sql, {
+    const query = await this.faina().query(sql, {
       type: QueryTypes.SELECT,
       ...opcoes
     });
