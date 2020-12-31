@@ -50,14 +50,14 @@ export class ApiPasta extends Controller {
                  , descricao
                  )
             VALUES
-                 ( :tipoId
-                 , :projetoId
+                 ( :tipo_id
+                 , :projeto_id
                  , :nome
                  , :descricao
                  );`, {
             replacements: {
-              tipoId: parametros[i].tipoId,
-              projetoId: parametros[i].projetoId,
+              tipo_id: parametros[i].tipo_id,
+              projeto_id: parametros[i].projeto_id,
               nome: parametros[i].nome,
               descricao: parametros[i].descricao
             },
@@ -115,22 +115,22 @@ export class ApiPasta extends Controller {
           const registro = await this.select(`
             /* Altera informações sobre a pasta */
             UPDATE pasta
-               SET tipo_id     = :tipoId
-                 , projeto_id  = :projetoId
+               SET tipo_id     = :tipo_id
+                 , projeto_id  = :projeto_id
                  , nome        = :nome
                  , descricao   = :descricao
-                 , alterado_id = :alteradoId
-                 , alterado_em = :alteradoEm
+                 , alterado_id = :alterado_id
+                 , alterado_em = :alterado_em
              WHERE excluido_em IS NULL
                AND id = :id`, {
             replacements: {
               id: parametros[i].id,
-              tipoId: parametros[i].tipoId,
-              projetoId: parametros[i].projetoId,
+              tipo_id: parametros[i].tipo_id,
+              projeto_id: parametros[i].projeto_id,
               nome: parametros[i].nome,
               descricao: parametros[i].descricao,
-              alteradoId: parametros[i].alteradoId,
-              alteradoEm: parametros[i].alteradoEm
+              alterado_id: parametros[i].alterado_id,
+              alterado_em: parametros[i].alterado_em
             },
             transaction: t,
             type: QueryTypes.UPDATE
