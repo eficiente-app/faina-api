@@ -67,7 +67,7 @@ export class ApiPasta extends Controller {
 
           pasta.push(registro[0]);
 
-          if (parametros[i].pastaId) {
+          if (parametros[i].pasta_id) {
             const registroPasta = await this.select(`
               /* Inserir o Relacionamento da Pasta com a Pasta Mãe */
               INSERT
@@ -80,7 +80,7 @@ export class ApiPasta extends Controller {
                    , LAST_INSERT_ID()
                    , ${0}
                 FROM pasta
-               WHERE pasta.id = ${parametros[i].pastaId};
+               WHERE pasta.id = ${parametros[i].pasta_id};
             `, {
               transaction: t,
               type: QueryTypes.INSERT
@@ -138,13 +138,13 @@ export class ApiPasta extends Controller {
 
           pasta.push(registro[1]);
 
-          if (parametros[i].pastaId && parametros[i].pastaIdNovo) {
+          if (parametros[i].pasta_id && parametros[i].pasta_idNovo) {
             const registroPasta = await this.select(`
                   /* Altera o Relacionamento da Pasta com a Pasta Mãe */
               UPDATE pasta_pasta
-                 SET mae_id  = ${parametros[i].pastaIdNovo}
+                 SET mae_id  = ${parametros[i].pasta_idNovo}
                WHERE filha_id = ${parametros[i].id}
-                 AND mae_id  = ${parametros[i].pastaId};`, {
+                 AND mae_id  = ${parametros[i].pasta_id};`, {
               type: QueryTypes.UPDATE,
               transaction: t
             });
@@ -172,12 +172,12 @@ export class ApiPasta extends Controller {
       const registro: any = await this.select(`
         UPDATE pasta
            SET excluido_em  = CURRENT_TIMESTAMP()
-             , excluido_id  = :userId
+             , excluido_id  = :user_id
          WHERE id           = ${req.params.id}
            AND excluido_em IS NULL
       `, {
         replacements: {
-          userId: 0
+          user_id: 0
         },
         type: QueryTypes.UPDATE
       });

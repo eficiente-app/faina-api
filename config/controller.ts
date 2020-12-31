@@ -1,7 +1,7 @@
 import Database from "@config/database";
-import validate from "@config/validate";
 import { All, Delete, Get, Head, Options, Patch, Post, Put } from "@config/decorators/request";
 import Route from "@config/decorators/route";
+import validate from "@config/validate";
 import { QueryTypes } from "sequelize";
 
 export {
@@ -29,7 +29,7 @@ export abstract class Controller {
     return this.database.instance;
   }
 
-  protected rules (params: any): Promise<any> {
+  protected async rules (params: any): Promise<any> {
     return params.reduce((obj: any, key: any) => ({
       ...obj,
       [key]: (<any>validate)[key]

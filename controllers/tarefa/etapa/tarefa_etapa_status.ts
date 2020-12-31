@@ -83,16 +83,16 @@ export class ApiTarefaEtapaStatus extends Controller {
             UPDATE tarefa_etapa_status
               SET nome        = :nome
                 , descricao   = :descricao
-                , alterado_id = :alteradoId
-                , alterado_em = :alteradoEm
+                , alterado_id = :alterado_id
+                , alterado_em = :alterado_em
             WHERE id = :id
           `, {
             replacements: {
               id: parametros[i].id,
               nome: parametros[i].nome,
               descricao: parametros[i].descricao,
-              alteradoId: parametros[i].alteradoId,
-              alteradoEm: parametros[i].alteradoEm
+              alterado_id: parametros[i].alterado_id,
+              alterado_em: parametros[i].alterado_em
             },
             transaction: t,
             type: QueryTypes.UPDATE
@@ -117,12 +117,12 @@ export class ApiTarefaEtapaStatus extends Controller {
       const registro: any = await this.select(`
         UPDATE tarefa_etapa_status
            SET excluido_em  = CURRENT_TIMESTAMP()
-             , excluido_id  = :userId
+             , excluido_id  = :user_id
          WHERE id           = ${req.params.id}
            AND excluido_em IS NULL
       `, {
         replacements: {
-          userId: 0
+          user_id: 0
         },
         type: QueryTypes.UPDATE
       });

@@ -1,23 +1,23 @@
 /pasta
   - Inserir
     {
-      "tipoId": 0,
-      "projetoId": null, // ou inteiro
+      "tipo_id": 0,
+      "projeto_id": null, // ou inteiro
       "nome": "",
       "descricao": "",
-      "pastaId": null, // Opcional, ID da pasta "Mãe"
-      "incluidoId": 0
+      "pasta_id": null, // Opcional, ID da pasta "Mãe"
+      "incluido_id": 0
     }
   - Alterar
     {
       "id": 0, // obrigatório
-      "tipoId": 2,
-      "projetoId": null, // ou inteiro
+      "tipo_id": 2,
+      "projeto_id": null, // ou inteiro
       "nome": "",
       "descricao": "",
-      "pastaId": null, // Opcional, ID da pasta "Mãe" anterior
-      "pastaIdNovo": null, // Opcional, ID da pasta "Mãe" nova
-      "alteradoId": 0
+      "pasta_id": null, // Opcional, ID da pasta "Mãe" anterior
+      "pasta_idNovo": null, // Opcional, ID da pasta "Mãe" nova
+      "alterado_id": 0
     }
   - Delete
     /id
@@ -27,14 +27,14 @@ pasta/tipo
     {
       "nome": "",
       "descricao": "",
-      "incluidoId": 0
+      "incluido_id": 0
     }
   - Alterar
     {
       "id": 0,
       "nome": "",
       "descricao": "",
-      "alteradoId": 0
+      "alterado_id": 0
     }
 
 tarefa/tipo
@@ -42,14 +42,14 @@ tarefa/tipo
     {
       "nome": "",
       "descricao": "",
-      "incluidoId": 0
+      "incluido_id": 0
     }
   - Alterar
     {
       "id": 0,
       "nome": "",
       "descricao": "",
-      "alteradoId": 0
+      "alterado_id": 0
     }
 
 tarefa/classificacao
@@ -57,14 +57,14 @@ tarefa/classificacao
     {
       "nome": "",
       "descricao": "",
-      "incluidoId": 0
+      "incluido_id": 0
     }
   - Alterar
     {
       "id": 0,
       "nome": "",
       "descricao": "",
-      "alteradoId": 0
+      "alterado_id": 0
     }
 
 tarefa/status
@@ -72,14 +72,14 @@ tarefa/status
     {
       "nome": "",
       "descricao": "",
-      "incluidoId": 0
+      "incluido_id": 0
     }
   - Alterar
     {
       "id": 0,
       "nome": "",
       "descricao": "",
-      "alteradoId": 0
+      "alterado_id": 0
     }
 
 tarefa/etapa/tipo
@@ -87,14 +87,14 @@ tarefa/etapa/tipo
     {
       "nome": "",
       "descricao": "",
-      "incluidoId": 0
+      "incluido_id": 0
     }
   - Alterar
     {
       "id": 0,
       "nome": "",
       "descricao": "",
-      "alteradoId": 0
+      "alterado_id": 0
     }
 
 tarefa/etapa/status
@@ -102,14 +102,14 @@ tarefa/etapa/status
     {
       "nome": "",
       "descricao": "",
-      "incluidoId": 0
+      "incluido_id": 0
     }
   - Alterar
     {
       "id": 0,
       "nome": "",
       "descricao": "",
-      "alteradoId": 0
+      "alterado_id": 0
     }
 
 tarefa
