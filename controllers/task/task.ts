@@ -1,9 +1,32 @@
 import Controller, { Delete, Get, Post, Put, Route } from "@config/controller";
+import Task from "@models/task";
 import { Request, Response } from "express";
 import { QueryTypes } from "sequelize";
 
+/**
+ * @export
+ *
+ * @class Controller
+ *
+ * @author Daniel Araujo
+ *
+ * @classdesc Classe Controller responsável pelo cadastro e manutenção de uma Tarefa.
+ *
+ * @extends {ProjetoController}
+ */
 @Route("/api/tarefa")
 export class ApiTarefa extends Controller {
+  protected readonly rulesInsert: any;
+  protected readonly rulesUpdate: any;
+
+  constructor () {
+    super();
+
+    this.rulesInsert = this.rules([
+      "type_id",
+      "name"
+    ]);
+  }
 
   @Get("/:id?")
   async listar (req: Request, res: Response): Promise<Response> {
