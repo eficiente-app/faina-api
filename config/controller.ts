@@ -2,6 +2,8 @@ import Database from "@config/database";
 import { All, Delete, Get, Head, Options, Patch, Post, Put } from "@config/decorators/request";
 import Route from "@config/decorators/route";
 import validate from "@config/validate";
+import HelperError from "@helpers/error";
+import HelperMessage from "@helpers/message";
 import { QueryTypes } from "sequelize";
 
 export {
@@ -18,9 +20,13 @@ export {
 
 export abstract class Controller {
   readonly database: Database;
+  protected error: HelperError;
+  protected message: HelperMessage;
 
   constructor () {
     this.database = new Database();
+    this.message = new HelperMessage();
+    this.error = new HelperError(this.message);
   }
 
   protected faina () {

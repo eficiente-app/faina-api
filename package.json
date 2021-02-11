@@ -45,6 +45,7 @@
   },
   "_moduleAliases": {
     "@config": "dist/config",
+    "@helpers": "dist/helpers",
     "@models": "dist/models"
   }
 }

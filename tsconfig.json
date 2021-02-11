@@ -15,6 +15,7 @@
     "emitDecoratorMetadata": true,
     "paths": {
       "@config/*": ["config/*"],
+      "@helpers/*": ["helpers/*"],
       "@models/*": ["models/*"],
       "*": [
         "node_modules/*",
