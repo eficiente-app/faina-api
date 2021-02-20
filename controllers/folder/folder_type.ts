@@ -1,4 +1,5 @@
 import Controller, { Delete, Get, Post, Put, Route } from "@config/controller";
+import Task from "@models/task";
 import { Request, Response } from "express";
 import { QueryTypes } from "sequelize";
 
