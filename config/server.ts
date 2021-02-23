@@ -1,5 +1,5 @@
-import routing from "@config/router";
 import Database from "@config/database";
+import routing from "@config/router";
 import bodyParser from "body-parser";
 import compression from "compression";
 import cors from "cors";
