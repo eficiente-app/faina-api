@@ -1,159 +1,124 @@
 import Controller, { Delete, Get, Post, Put, Route } from "@config/controller";
-import Task from "@models/task";
+import FolderType from "@models/folder_type";
 import { Request, Response } from "express";
-import { QueryTypes } from "sequelize";
+import validate from "validate.js";
 
-@Route("/api/folder-type")
-export class FolderTypeController extends Controller {
-  @Get()
-  async find (_req: Request, res: Response): Promise<Response> {
+@Route("/api/folder/type")
+export class ApiFolderType extends Controller {
+  protected readonly rulesInsert: any;
+  protected readonly rulesUpdate: any;
+
+  constructor () {
+    super();
+
+    this.rulesInsert = this.rules([
+      "name",
+      "description"
+    ]);
+
+    this.rulesUpdate = Object.assign(this.rules(["id"]), this.rulesInsert);
+  }
+
+  @Get("/")
+  async find (req: Request, res: Response): Promise<Response> {
     try {
-      const sql = `
-        SELECT ft.id
-             , ft.name
-             , ft.description
-          FROM folder_type ft
+      let sql: string = `
+        select id
+             , name
+             , description
+          from folder_type
+         where deleted_at is null`;
 
-         WHERE ft.deleted_at IS NULL`;
+    if (req.query.name) sql += ` AND name LIKE '%${req.query.name}%'`;
+    if (req.query.description) sql += ` AND description LIKE '%${req.query.description}%'`;
 
-      const folderTypes: any = await this.select(sql);
+      sql += ` limit 1000`;
 
-      return res.json(folderTypes);
+      const registros = await this.select(sql);
+
+      return res.json({registros: registros});
     } catch (e) {
-      return res.json({
-        status: false,
-        message: e.message
-      });
+      return res.status(500).json({ erro: e.message });
     }
   }
 
-  @Get("/:id")
+  @Get("/:id?")
   async read (req: Request, res: Response): Promise<Response> {
     try {
-      const sql = `
-        SELECT ft.id
-             , ft.name
-             , ft.description
-          FROM folder_type ft
-
-         WHERE ft.deleted_at IS NULL
-           AND ft.id = :id`;
-
-      const folderType: any = await this.select(sql, {
-        plain: true,
-        replacements: {
-          id: Number(req.params.id)
-        }
+      const record = await FolderType.findByPk(req.params.id, {
+        attributes: ["id", "name", "description"]
       });
 
-      return res.json(folderType);
+      if (!record) {
+        this.error.notFoundForRead();
+      }
+
+      return res.json(record);
     } catch (e) {
-      return res.json({
-        status: false,
-        message: e.message
-      });
+      return res.status(500).json({ erro: e.message });
     }
   }
 
-  @Post()
+  @Post("")
   async create (req: Request, res: Response): Promise<Response> {
     try {
-      let folderType: any = {};
+      const erro = validate(req.body, this.rulesInsert);
 
-      await this.faina().transaction(async (t) => {
-        const register = await this.select(`
-          INSERT
-            INTO folder_type
-               ( name
-               , description
-               )
-          VALUES
-               ( :name
-               , :description
-               );`, {
-          replacements: {
-            name: req.body.name,
-            description: req.body.description
-          },
-          transaction: t,
-          type: QueryTypes.INSERT
-        });
+      if (erro) return res.status(500).json({ erro });
 
-        folderType = register;
-      });
+      const folderType = await FolderType.create(req.body);
 
       return res.json({
-        folderType
+        id: folderType.id,
+        message: this.message.successCreate()
       });
     } catch (e) {
-      return res.json({
-        status: false,
-        message: e.message
-      });
+      return res.status(500).json({ erro: e.message });
     }
   }
 
-  @Put()
+  @Put("")
   async update (req: Request, res: Response): Promise<Response> {
     try {
-      let folderType: any = {};
+      const erro = validate(req.body, this.rulesUpdate);
 
-      await this.faina().transaction(async (t) => {
-        const register = await this.select(`
-          UPDATE folder_type
-             SET name = :name
-               , description = :description
-           WHERE deleted_at IS NULL
-             AND id = :id`, {
-          replacements: {
-            id: req.body.id,
-            name: req.body.name,
-            description: req.body.description
-          },
-          transaction: t,
-          type: QueryTypes.UPDATE
-        });
+      if (erro) return res.status(500).json({ erro });
 
-        folderType = register[1]
-      });
+      const folderType = await FolderType.findByPk(req.body.id);
+
+      if (!folderType) this.error.notFoundForUpdate();
+
+      folderType.name = req.body.name;
+      folderType.description = req.body.description;
+
+      await folderType.save();
 
       return res.json({
-        folderType
+        id: folderType.id,
+        message: this.message.successUpdate()
       });
     } catch (e) {
-      return res.json({
-        status: false,
-        message: e.message
-      });
+      return res.status(500).json({ erro: e.message });
     }
   }
 
   @Delete("/:id")
   async delete (req: Request, res: Response): Promise<Response> {
     try {
-      const register: any = await this.select(`
-        UPDATE folder_type
-           SET deleted_at  = CURRENT_TIMESTAMP()
-             , deleted_by  = :user_id
-         WHERE id           = ${req.params.id}
-           AND deleted_at IS NULL
-      `, {
-        replacements: {
-          user_id: 0
-        },
-        type: QueryTypes.UPDATE
-      });
+      const folderType = await FolderType.findByPk(req.params.id);
 
-      await register.destroy();
+      if (!folderType) this.error.notFoundForDelete();
 
-      return res.json(register[1]);
-    } catch (e) {
+      await folderType.destroy();
+
       return res.json({
-        status: false,
-        message: e.message
+        id: Number(req.params.id),
+        message: this.message.successDelete()
       });
+    } catch (e) {
+      return res.status(500).json({ erro: e.message });
     }
   }
 }
 
-export default FolderTypeController;
+export default ApiFolderType;
