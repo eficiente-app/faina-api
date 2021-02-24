@@ -3,10 +3,10 @@ import { Request, Response } from "express";
 import { QueryTypes } from "sequelize";
 
 @Route("/api/view/list")
-export class ApiTarefa extends Controller {
+export class ApiViewList extends Controller {
 
   @Get("")
-  async listar (req: Request, res: Response): Promise<Response> {
+  async list (req: Request, res: Response): Promise<Response> {
     try {
       let sql = `
  SELECT task.id
@@ -35,11 +35,11 @@ export class ApiTarefa extends Controller {
   WHERE task.deleted_at IS NULL
       `;
 
-      const registros: any = await this.select(sql, {
+      const data: any = await this.select(sql, {
         type: QueryTypes.SELECT
       });
 
-      return res.json(registros);
+      return res.json({data: data});
     } catch (e) {
       return res.json({
         sucesso: false,
@@ -49,4 +49,4 @@ export class ApiTarefa extends Controller {
   }
 }
 
-export default ApiTarefa;
+export default ApiViewList;
