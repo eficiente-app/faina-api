@@ -73,11 +73,11 @@ export class TaskController extends Controller {
       const { id }: any = req.params;
 
       if (isNaN(id)) {
-        throw new Error("Task inválido.");
+        throw new Error("Tarefa inválida.");
       }
 
       let sql: string = this.query();
-      sql += ` AND p.id = :id`;
+      sql += ` WHERE task.id = :id`;
 
       const Task: any = await this.select(sql, {
         plain: true,
@@ -87,7 +87,7 @@ export class TaskController extends Controller {
       });
 
       if (validate.isEmpty(Task)) {
-        throw new Error("Task não encontrado.");
+        throw new Error("Tarefa não encontrada.");
       }
 
       return res.json(Task);
@@ -99,7 +99,7 @@ export class TaskController extends Controller {
     }
   }
 
-  @Post("")
+  @Post()
   async create (req: Request, res: Response): Promise<Response> {
     try {
       const erro = validate(req.body, this.rulesInsert);
@@ -118,26 +118,50 @@ export class TaskController extends Controller {
   }
 
   @Put()
-  async update (_req: Request, res: Response): Promise<Response> {
+  async update (req: Request, res: Response): Promise<Response> {
     try {
+      const erro = validate(req.body, this.rulesUpdate);
 
-    } catch (e) {
+      if (erro) return res.status(500).json({ erro });
+
+      const task = await Task.findByPk(req.body.id);
+
+      if (!task) this.error.notFoundForUpdate();
+
+      task.task_id     = req.body.task_id;
+      task.type_id     = req.body.type_id;
+      task.label_id    = req.body.label_id;
+      task.status_id   = req.body.status_id;
+      task.name        = req.body.name;
+      task.description = req.body.description;
+      task.due_date    = req.body.due_date;
+
+      await task.save();
+
       return res.json({
-        sucesso: false,
-        mensagem: e.message
+        id: task.id,
+        message: this.message.successUpdate()
       });
+    } catch (e) {
+      return res.status(500).json({ erro: e.message });
     }
   }
 
   @Delete("/:id")
-  async delete (_req: Request, res: Response): Promise<Response> {
+  async delete (req: Request, res: Response): Promise<Response> {
     try {
+      const task = await Task.findByPk(req.params.id);
 
-    } catch (e) {
+      if (!task) this.error.notFoundForDelete();
+
+      await task.destroy();
+
       return res.json({
-        sucesso: false,
-        mensagem: e.message
+        id: Number(req.params.id),
+        message: this.message.successDelete()
       });
+    } catch (e) {
+      return res.status(500).json({ erro: e.message });
     }
   }
 }
