@@ -9,7 +9,6 @@ class Database {
   params: any;
 
   constructor () {
-    
     this.params = {
       dialect: process.env.DB_DIALECT,
       database: process.env.DB_DATABASE,
