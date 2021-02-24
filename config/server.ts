@@ -1,3 +1,4 @@
+import Database from "@config/database";
 import routing from "@config/router";
 import bodyParser from "body-parser";
 import compression from "compression";
@@ -24,6 +25,9 @@ export class FainaServer {
     app.use(helmet());
 
     await routing(app);
+
+    const database: Database = new Database();
+    await <any>database.config();
 
     app.get("*", (_req: express.Request, res: express.Response) => {
       res.sendFile(path.join(publicPath, "index.html"));

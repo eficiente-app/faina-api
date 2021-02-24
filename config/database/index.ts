@@ -9,7 +9,6 @@ class Database {
   params: any;
 
   constructor () {
-    
     this.params = {
       dialect: process.env.DB_DIALECT,
       database: process.env.DB_DATABASE,
@@ -18,7 +17,7 @@ class Database {
       host: process.env.DB_HOST,
       logging: (process.env.APP_DEBUG === "true") ? console.log : false,
       modelPaths: [
-        path.join(__dirname, "../../models")
+        path.join(__dirname, "../../models/**")
       ],
       dialectOptions: {
         useUTC: true,
