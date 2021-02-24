@@ -6,9 +6,9 @@ import { QueryTypes } from "sequelize";
 export class ApiViewList extends Controller {
 
   @Get("")
-  async list (req: Request, res: Response): Promise<Response> {
+  async list (_req: Request, res: Response): Promise<Response> {
     try {
-      let sql = `
+      const sql = `
  SELECT task.id
       , type_id
       , type.name AS type_name
