@@ -10,7 +10,7 @@
             "name": "Launch Program",
             "program": "${workspaceFolder}\\index.ts",
             "skipFiles": [
-                "<node_internal>/**"
+                "<node_internals>/**"
             ]
         }
     ]

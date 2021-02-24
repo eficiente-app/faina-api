@@ -1,10 +1,10 @@
 import Controller, { Delete, Get, Post, Put, Route } from "@config/controller";
-import FolderType from "@models/folder/folder_type";
+import StageType from "@models/task/stage/stage_type";
 import { Request, Response } from "express";
 import validate from "validate.js";
 
-@Route("/api/folder/type")
-export class ApiFolderType extends Controller {
+@Route("/api/task/stage/type")
+export class ApiStageType extends Controller {
   protected readonly rulesInsert: any;
   protected readonly rulesUpdate: any;
 
@@ -26,7 +26,7 @@ export class ApiFolderType extends Controller {
         select id
              , name
              , description
-          from folder_type
+          from stage_type
          where deleted_at is null`;
 
     if (req.query.name) sql += ` AND name LIKE '%${req.query.name}%'`;
@@ -45,7 +45,7 @@ export class ApiFolderType extends Controller {
   @Get("/:id?")
   async read (req: Request, res: Response): Promise<Response> {
     try {
-      const record = await FolderType.findByPk(req.params.id, {
+      const record = await StageType.findByPk(req.params.id, {
         attributes: ["id", "name", "description"]
       });
 
@@ -66,10 +66,10 @@ export class ApiFolderType extends Controller {
 
       if (erro) return res.status(500).json({ erro });
 
-      const folderType = await FolderType.create(req.body);
+      const stageType = await StageType.create(req.body);
 
       return res.json({
-        id: folderType.id,
+        id: stageType.id,
         message: this.message.successCreate()
       });
     } catch (e) {
@@ -84,17 +84,17 @@ export class ApiFolderType extends Controller {
 
       if (erro) return res.status(500).json({ erro });
 
-      const folderType = await FolderType.findByPk(req.body.id);
+      const stageType = await StageType.findByPk(req.body.id);
 
-      if (!folderType) this.error.notFoundForUpdate();
+      if (!stageType) this.error.notFoundForUpdate();
 
-      folderType.name = req.body.name;
-      folderType.description = req.body.description;
+      stageType.name = req.body.name;
+      stageType.description = req.body.description;
 
-      await folderType.save();
+      await stageType.save();
 
       return res.json({
-        id: folderType.id,
+        id: stageType.id,
         message: this.message.successUpdate()
       });
     } catch (e) {
@@ -105,11 +105,11 @@ export class ApiFolderType extends Controller {
   @Delete("/:id")
   async delete (req: Request, res: Response): Promise<Response> {
     try {
-      const folderType = await FolderType.findByPk(req.params.id);
+      const stageType = await StageType.findByPk(req.params.id);
 
-      if (!folderType) this.error.notFoundForDelete();
+      if (!stageType) this.error.notFoundForDelete();
 
-      await folderType.destroy();
+      await stageType.destroy();
 
       return res.json({
         id: Number(req.params.id),
@@ -121,4 +121,4 @@ export class ApiFolderType extends Controller {
   }
 }
 
-export default ApiFolderType;
+export default ApiStageType;
