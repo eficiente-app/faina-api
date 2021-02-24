@@ -45,7 +45,7 @@ export class TaskController extends Controller {
              , name
              , description
              , due_date
-          FROM task 
+          FROM task
             `;
 
     return sql;

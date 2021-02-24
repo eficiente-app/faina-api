@@ -7,7 +7,7 @@ import {
     PrimaryKey,
     Table
   } from "sequelize-typescript";
-  
+
   @Table({
     tableName: "task"
   })
@@ -36,15 +36,14 @@ import {
     @AllowNull(false)
     @Column(DataType.STRING)
     name: string;
-  
+
     @AllowNull(false)
     @Column(DataType.STRING)
     description: string;
-  
+
     @AllowNull(false)
     @Column(DataType.STRING)
     due_date: string;
   }
-  
+
   export default Task;
-  
