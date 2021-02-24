@@ -1,5 +1,5 @@
 import Controller, { Delete, Get, Post, Put, Route } from "@config/controller";
-import FolderType from "@models/folder_type";
+import FolderType from "@models/folder/folder_type";
 import { Request, Response } from "express";
 import validate from "validate.js";
 
