@@ -5,21 +5,50 @@ import validate from "validate.js";
 
 @Route("/api/folder/type")
 export class ApiFolderType extends Controller {
-  protected readonly rulesInsert: any;
-  protected readonly rulesUpdate: any;
+  private readonly validateCreate: any;
+  private readonly validateUpdate: any;
 
   constructor () {
     super();
 
-    this.rulesInsert = this.rules([
-      "name",
-      "description"
-    ]);
+    this.validateCreate = {
+      name: {
+        presence: {
+          allowEmpty: false,
+          message: "^Nome não informado."
+        },
+        length: {
+          maximum: 100,
+          tooLong: "^Nome deve ter no máximo %{count} caracteres."
+        }
+      },
+      description: {
+        presence: {
+          allowEmpty: false,
+          message: "^Descrição não informada."
+        },
+        length: {
+          maximum: 1000,
+          tooLong: "^Descrição deve ter no máximo %{count} caracteres."
+        }
+      }
+    };
 
-    this.rulesUpdate = Object.assign(this.rules(["id"]), this.rulesInsert);
+    this.validateUpdate = {
+      id: {
+        presence: {
+          allowEmpty: false,
+          message: "^ID não informado."
+        },
+        numericality: {
+          notValid: "^ID inválido."
+        }
+      },
+      ...this.validateCreate
+    };
   }
 
-  @Get("/")
+  @Get()
   async find (req: Request, res: Response): Promise<Response> {
     try {
       let sql: string = `
@@ -37,8 +66,13 @@ export class ApiFolderType extends Controller {
       const registros = await this.select(sql);
 
       return res.json(registros);
-    } catch (e) {
-      return res.status(500).json({ erro: e.message });
+    } catch (err) {
+      return res.status(500).json({
+        error: {
+          message: err.message,
+          type: err.name
+        }
+      });
     }
   }
 
@@ -54,39 +88,55 @@ export class ApiFolderType extends Controller {
       }
 
       return res.json(record);
-    } catch (e) {
-      return res.status(500).json({ erro: e.message });
+    } catch (err) {
+      return res.status(500).json({
+        error: {
+          message: err.message,
+          type: err.name
+        }
+      });
     }
   }
 
-  @Post("")
+  @Post()
   async create (req: Request, res: Response): Promise<Response> {
     try {
-      const erro = validate(req.body, this.rulesInsert);
+      const errors = validate(req.body, this.validateCreate);
 
-      if (erro) return res.status(500).json({ erro });
+      if (errors) {
+        return res.status(500).json({ errors });
+      }
 
-      const folderType = await FolderType.create(req.body);
+      const record = await FolderType.create(req.body);
 
       return res.json({
-        id: folderType.id,
+        id: record.id,
         message: this.message.successCreate()
       });
-    } catch (e) {
-      return res.status(500).json({ erro: e.message });
+    } catch (err) {
+      return res.status(500).json({
+        error: {
+          message: err.message,
+          type: err.name
+        }
+      });
     }
   }
 
-  @Put("")
+  @Put()
   async update (req: Request, res: Response): Promise<Response> {
     try {
-      const erro = validate(req.body, this.rulesUpdate);
+      const errors = validate(req.body, this.validateUpdate);
 
-      if (erro) return res.status(500).json({ erro });
+      if (errors) {
+        return res.status(500).json({ errors });
+      }
 
       const folderType = await FolderType.findByPk(req.body.id);
 
-      if (!folderType) this.error.notFoundForUpdate();
+      if (!folderType) {
+        this.error.notFoundForUpdate();
+      }
 
       folderType.name = req.body.name;
       folderType.description = req.body.description;
@@ -97,26 +147,38 @@ export class ApiFolderType extends Controller {
         id: folderType.id,
         message: this.message.successUpdate()
       });
-    } catch (e) {
-      return res.status(500).json({ erro: e.message });
+    } catch (err) {
+      return res.status(500).json({
+        error: {
+          message: err.message,
+          type: err.name
+        }
+      });
     }
   }
 
   @Delete("/:id")
   async delete (req: Request, res: Response): Promise<Response> {
     try {
-      const folderType = await FolderType.findByPk(req.params.id);
+      const record = await FolderType.findByPk(req.params.id);
 
-      if (!folderType) this.error.notFoundForDelete();
+      if (!record) {
+        this.error.notFoundForDelete();
+      }
 
-      await folderType.destroy();
+      await record.destroy();
 
       return res.json({
         id: Number(req.params.id),
         message: this.message.successDelete()
       });
-    } catch (e) {
-      return res.status(500).json({ erro: e.message });
+    } catch (err) {
+      return res.status(500).json({
+        error: {
+          message: err.message,
+          type: err.name
+        }
+      });
     }
   }
 }
