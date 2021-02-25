@@ -36,7 +36,7 @@ export class TaskApiStageType extends Controller {
 
       const registros = await this.select(sql);
 
-      return res.json({registros: registros});
+      return res.json(registros);
     } catch (e) {
       return res.status(500).json({ erro: e.message });
     }
