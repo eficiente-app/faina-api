@@ -26,7 +26,7 @@ export class ApiProjectType extends Controller {
         select id
              , name
              , description
-          from projectType
+          from project_type
          where deleted_at is null`;
 
     if (req.query.name) sql += ` AND name LIKE '%${req.query.name}%'`;
