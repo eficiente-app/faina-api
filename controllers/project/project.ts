@@ -190,7 +190,9 @@ export class ProjectController extends Controller {
         end
       }: any = req.body;
 
-      const project = await Project.findByPk(id);
+      const project = await Project.findByPk(id, {
+        paranoid: false
+      });
 
       if (validate.isEmpty(project)) {
         throw new Error("Projeto não encontrado.");

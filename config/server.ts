@@ -1,5 +1,5 @@
-import routing from "@config/router";
 import Database from "@config/database";
+import routing from "@config/router";
 import validate from "@config/validate";
 import bodyParser from "body-parser";
 import compression from "compression";
@@ -25,7 +25,7 @@ export class FainaServer {
     app.use(express.static(publicPath));
     app.use(helmet());
 
-    await validate();
+    validate();
     await routing(app);
 
     const database: Database = new Database();
