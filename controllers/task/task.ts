@@ -21,10 +21,7 @@ export class ApiTarefa extends Controller {
   constructor () {
     super();
 
-    this.rulesInsert = this.rules([
-      "type_id",
-      "name"
-    ]);
+    this.rulesInsert = { };
   }
 
   @Get("/:id?")
