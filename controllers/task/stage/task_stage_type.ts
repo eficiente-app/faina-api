@@ -1,10 +1,10 @@
 import Controller, { Delete, Get, Post, Put, Route } from "@config/controller";
-import StageType from "@models/task/stage/stage_type";
+import TaskStageType from "@models/task/stage/task_stage_type";
 import { Request, Response } from "express";
 import validate from "validate.js";
 
 @Route("/api/task/stage/type")
-export class ApiStageType extends Controller {
+export class TaskApiStageType extends Controller {
   protected readonly rulesInsert: any;
   protected readonly rulesUpdate: any;
 
@@ -26,7 +26,7 @@ export class ApiStageType extends Controller {
         select id
              , name
              , description
-          from stage_type
+          from task_stage_type
          where deleted_at is null`;
 
     if (req.query.name) sql += ` AND name LIKE '%${req.query.name}%'`;
@@ -45,7 +45,7 @@ export class ApiStageType extends Controller {
   @Get("/:id?")
   async read (req: Request, res: Response): Promise<Response> {
     try {
-      const record = await StageType.findByPk(req.params.id, {
+      const record = await TaskStageType.findByPk(req.params.id, {
         attributes: ["id", "name", "description"]
       });
 
@@ -66,7 +66,7 @@ export class ApiStageType extends Controller {
 
       if (erro) return res.status(500).json({ erro });
 
-      const stageType = await StageType.create(req.body);
+      const stageType = await TaskStageType.create(req.body);
 
       return res.json({
         id: stageType.id,
@@ -84,7 +84,7 @@ export class ApiStageType extends Controller {
 
       if (erro) return res.status(500).json({ erro });
 
-      const stageType = await StageType.findByPk(req.body.id);
+      const stageType = await TaskStageType.findByPk(req.body.id);
 
       if (!stageType) this.error.notFoundForUpdate();
 
@@ -105,7 +105,7 @@ export class ApiStageType extends Controller {
   @Delete("/:id")
   async delete (req: Request, res: Response): Promise<Response> {
     try {
-      const stageType = await StageType.findByPk(req.params.id);
+      const stageType = await TaskStageType.findByPk(req.params.id);
 
       if (!stageType) this.error.notFoundForDelete();
 
@@ -121,4 +121,4 @@ export class ApiStageType extends Controller {
   }
 }
 
-export default ApiStageType;
+export default TaskApiStageType;

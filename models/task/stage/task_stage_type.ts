@@ -9,9 +9,9 @@ import {
 } from "sequelize-typescript";
 
 @Table({
-  tableName: "stage_type"
+  tableName: "task_stage_type"
 })
-class StageType extends Model<StageType> {
+class TaskStageType extends Model<TaskStageType> {
   @AutoIncrement
   @PrimaryKey
   @Column
@@ -19,11 +19,11 @@ class StageType extends Model<StageType> {
 
   @AllowNull(false)
   @Column(DataType.STRING)
-  name: number;
+  name: string;
 
   @AllowNull(false)
   @Column(DataType.STRING)
-  description: number;
+  description: string;
 }
 
-export default StageType;
+export default TaskStageType;
