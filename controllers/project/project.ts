@@ -73,7 +73,6 @@ export class ProjectController extends Controller {
     try {
       await validate.async(body, params);
     } catch (err) {
-      console.log(err)
       errors = assign(err, errors);
     }
 
