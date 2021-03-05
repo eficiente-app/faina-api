@@ -9,21 +9,21 @@ import {
 } from "sequelize-typescript";
 
 @Table({
-  tableName: "task_stage_type"
+  tableName: "folder_folder"
 })
-class TaskStageType extends Model<TaskStageType> {
+class FolderFolder extends Model<FolderFolder> {
   @AutoIncrement
   @PrimaryKey
   @Column
   id: number;
 
   @AllowNull(false)
-  @Column(DataType.STRING)
-  name: string;
+  @Column(DataType.NUMBER)
+  parent_id: number;
 
   @AllowNull(false)
-  @Column(DataType.STRING)
-  description: string;
+  @Column(DataType.NUMBER)
+  folder_id: number;
 }
 
-export default TaskStageType;
+export default FolderFolder;
