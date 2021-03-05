@@ -6,6 +6,7 @@
   "scripts": {
     "dev": "concurrently \"tsc -w -p tsconfig.dev.json\" \"nodemon dist/index\"",
     "build": "rm -rf dist && yarn && tsc -p tsconfig.json",
+    "build-win": "rd /s /q dist && yarn && tsc -p tsconfig.json",
     "start": "node dist/index.js",
     "lint": "tslint -c tslint.json -p tsconfig.json"
   },
