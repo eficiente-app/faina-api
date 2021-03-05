@@ -1,7 +1,7 @@
 import Controller, { Delete, Get, Post, Put, Route } from "@config/controller";
 import Folder from "@models/folder/folder";
+import FolderFolder from "@models/folder/folder_folder";
 import { Request, Response } from "express";
-import { QueryTypes } from "sequelize";
 import validate from "validate.js";
 
 @Route("/api/folder")
@@ -62,7 +62,7 @@ export class FolderController extends Controller {
 
   }
 
-  @Get("/")
+  @Get()
   async find (_req: Request, res: Response): Promise<Response> {
     try {
       const sql = `
@@ -123,71 +123,43 @@ export class FolderController extends Controller {
   @Post()
   async create (req: Request, res: Response): Promise<Response> {
     try {
-      // FIX-ME: Definir validações de formulário.
       const errors = validate(req.body, this.validateCreate);
 
       if (errors) {
         return res.status(500).json({ errors });
       }
 
-      const parameters: Array<any> = this.toArray(req.body);
-      const folder: Array<any> = [];
-      const folderFolder: Array<any> = [];
+      const { type_id, project_id, name, description, folder_id } = req.body;
 
+      let folder: any;
       await this.faina().transaction(async (t) => {
-        for (let i = 0; i < parameters.length; i++) {
-          const register = await this.select(`
-            INSERT
-              INTO folder
-                 ( type_id
-                 , project_id
-                 , name
-                 , description
-                 )
-            VALUES
-                 ( :type_id
-                 , :project_id
-                 , :name
-                 , :description
-                 );`, {
-            replacements: {
-              type_id: parameters[i].type_id,
-              project_id: parameters[i].project_id,
-              name: parameters[i].name,
-              description: parameters[i].description
-            },
-            transaction: t,
-            type: QueryTypes.INSERT
+
+        folder = await Folder.create({
+          type_id: type_id,
+          project_id: project_id,
+          description: description,
+          name: name
+        }, {
+          transaction: t
+        });
+
+        // Inserir o Relacionamento da Pasta com a Pasta Mãe
+        if (!validate.isEmpty(folder_id)) {
+          await FolderFolder.create({
+            parent_id: folder.id,
+            folder_id: folder_id
+          }, {
+            transaction: t
           });
-
-          folder.push(register[0]);
-
-          if (parameters[i].folder_id) {
-            const registerFolder = await this.select(`
-              /* Inserir o Relacionamento da Pasta com a Pasta Mãe */
-              INSERT
-                INTO folder_folder
-                   ( parent_id
-                   , folder_id
-                   )
-              SELECT LAST_INSERT_ID()
-                   , folder.id
-                FROM folder
-               WHERE folder.id = ${parameters[i].folder_id};
-            `, {
-              transaction: t,
-              type: QueryTypes.INSERT
-            });
-
-            folderFolder.push(registerFolder[0]);
-          }
         }
+
       });
 
-      return res.json({
-        folder,
-        folderFolder
-      });
+    return res.json({
+      folderId: folder.id,
+      message: this.message.successCreate()
+    });
+
     } catch (err) {
       return res.status(500).json({
         error: {
@@ -207,53 +179,40 @@ export class FolderController extends Controller {
         return res.status(500).json({ errors });
       }
 
-      const parameters: Array<any> = this.toArray(req.body);
-      const folder: Array<any> = [];
-      const folderFolder: Array<any> = [];
+      const { type_id, project_id, name, description, folder_id, folder_idNew } = req.body;
+
+      const folder = await Folder.findByPk(req.body.id);
+
+      if (!folder) {
+        this.error.notFoundForUpdate();
+      }
+
+      folder.type_id = type_id;
+      folder.project_id = project_id;
+      folder.description = description;
+      folder.name = name;
 
       await this.faina().transaction(async (t) => {
-        for (let i = 0; i < parameters.length; i++) {
-          const register = await this.select(`
-            /* Altera informações sobre a pasta */
-            UPDATE folder
-               SET type_id     = :type_id
-                 , project_id  = :project_id
-                 , name        = :name
-                 , description = :description
-             WHERE deleted_at IS NULL
-               AND id = :id`, {
-            replacements: {
-              id: parameters[i].id,
-              type_id: parameters[i].type_id,
-              project_id: parameters[i].project_id,
-              name: parameters[i].name,
-              description: parameters[i].description
-            },
-            transaction: t,
-            type: QueryTypes.UPDATE
+        await folder.save({ transaction: t });
+
+        if (!validate.isEmpty(folder_idNew)) {
+          const folderFolder = await FolderFolder.findOne({
+            where: {
+              parent_id: req.body.id,
+              folder_id: folder_id
+            }
           });
 
-          folder.push(register[1]);
-
-          if (parameters[i].folder_id && parameters[i].folder_idNew) {
-            const registerFolder = await this.select(`
-                  /* Altera o Relacionamento da Pasta com a Pasta Mãe */
-              UPDATE folder_folder
-                 SET parent_id = ${parameters[i].folder_idNew}
-               WHERE parent_id = ${parameters[i].id}
-                 AND folder_id = ${parameters[i].pasta_id};`, {
-              type: QueryTypes.UPDATE,
-              transaction: t
-            });
-
-            folderFolder.push(registerFolder[1]);
+          if (folderFolder) {
+            folderFolder.folder_id = folder_idNew;
+            await folderFolder.save({ transaction: t });
           }
         }
       });
 
       return res.json({
-        folder,
-        folderFolder
+        id: folder.id,
+        message: this.message.successUpdate()
       });
     } catch (err) {
       return res.status(500).json({
