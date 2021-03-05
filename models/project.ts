@@ -1,3 +1,4 @@
+import { Moment } from "moment";
 import {
   AllowNull,
   AutoIncrement,
@@ -9,9 +10,9 @@ import {
 } from "sequelize-typescript";
 
 @Table({
-  tableName: "projeto"
+  tableName: "project"
 })
-class Projeto extends Model<Projeto> {
+class Project extends Model<Project> {
   @AutoIncrement
   @PrimaryKey
   @Column
@@ -19,15 +20,23 @@ class Projeto extends Model<Projeto> {
 
   @AllowNull(false)
   @Column(DataType.STRING)
-  nome: number;
+  name: number;
 
   @AllowNull(false)
   @Column(DataType.STRING)
-  descricao: number;
+  description: number;
 
   @AllowNull(false)
   @Column(DataType.NUMBER)
-  tipo: string;
+  type_id: string;
+
+  @AllowNull(true)
+  @Column(DataType.DATE)
+  start: Moment;
+
+  @AllowNull(true)
+  @Column(DataType.DATE)
+  end: Moment;
 }
 
-export default Projeto;
+export default Project;

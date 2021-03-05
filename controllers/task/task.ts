@@ -22,17 +22,8 @@ export class TaskController extends Controller {
   constructor () {
     super();
 
-    this.rulesInsert = this.rules([
-      "task_id",
-      "type_id",
-      "label_id",
-      "status_id",
-      "name",
-      "description",
-      "due_date"
-    ]);
-
-    this.rulesUpdate = Object.assign(this.rules(["id"]), this.rulesInsert);
+    this.rulesInsert = [];
+    this.rulesUpdate = [];
   }
 
   protected query (): string {
