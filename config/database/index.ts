@@ -21,7 +21,7 @@ class Database {
       ],
       dialectOptions: {
         useUTC: true,
-        timezone: "Etc/GMT"
+        timezone: "America/Porto_Velho"
       },
       define: {
         timestamps: false,

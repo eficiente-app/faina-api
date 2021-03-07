@@ -1,40 +1,15 @@
-export default {
-  id: {
-    presence: {
-      allowEmpty: false,
-      message: "^ID não informado."
+import moment from "moment";
+import validate from "validate.js";
+
+export default function (): void {
+  validate.extend(validate.validators.datetime, {
+    parse: function (value: any) {
+      return +moment.utc(value);
     },
-    numericality: {
-      notValid: "^ID inválido."
+    format: function (value: any, options: any) {
+      const format = options.dateOnly ? "YYYY-MM-DD" : "YYYY-MM-DD hh:mm:ss";
+
+      return moment.utc(value).format(format);
     }
-  },
-  nome: {
-    presence: {
-      allowEmpty: false,
-      message: "^Nome não informado."
-    },
-    length: {
-      maximum: 100,
-      tooLong: "^Nome deve ter no máximo %{count} caracteres."
-    }
-  },
-  descricao: {
-    presence: {
-      allowEmpty: false,
-      message: "^Descrição não informada."
-    },
-    length: {
-      maximum: 255,
-      tooLong: "^Descrição deve ter no máximo %{count} caracteres."
-    }
-  },
-  tipo: {
-    presence: {
-      allowEmpty: false,
-      message: "^Tipo não informado."
-    },
-    numericality: {
-      notValid: "^Tipo inválido."
-    }
-  }
-};
+  });
+}

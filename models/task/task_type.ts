@@ -19,11 +19,11 @@ class TaskType extends Model<TaskType> {
 
   @AllowNull(false)
   @Column(DataType.STRING)
-  name: number;
+  name: string;
 
   @AllowNull(false)
   @Column(DataType.STRING)
-  description: number;
+  description: string;
 }
 
 export default TaskType;

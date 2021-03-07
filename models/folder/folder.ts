@@ -9,13 +9,21 @@ import {
 } from "sequelize-typescript";
 
 @Table({
-  tableName: "folder_type"
+  tableName: "folder"
 })
-class FolderType extends Model<FolderType> {
+class Folder extends Model<Folder> {
   @AutoIncrement
   @PrimaryKey
   @Column
   id: number;
+
+  @AllowNull(false)
+  @Column(DataType.NUMBER)
+  type_id: number;
+
+  @AllowNull(false)
+  @Column(DataType.NUMBER)
+  project_id: number;
 
   @AllowNull(false)
   @Column(DataType.STRING)
@@ -26,4 +34,4 @@ class FolderType extends Model<FolderType> {
   description: string;
 }
 
-export default FolderType;
+export default Folder;
