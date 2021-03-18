@@ -31,7 +31,7 @@ export class TaskScheduleUserController extends Controller {
         SELECT id
              , schedule_id
              , user_id
-             , requiered
+             , required
              , confirm
           FROM task_schedule_user
             `;
@@ -119,7 +119,7 @@ export class TaskScheduleUserController extends Controller {
       task_schedule_user.id          = req.body.id;
       task_schedule_user.schedule_id = req.body.schedule_id;
       task_schedule_user.user_id     = req.body.user_id;
-      task_schedule_user.requiered   = req.body.requiered;
+      task_schedule_user.required   = req.body.required;
       task_schedule_user.confirm     = req.body.confirm;
 
       await task_schedule_user.save();

@@ -27,7 +27,7 @@ import {
 
     @AllowNull(false)
     @Column(DataType.BOOLEAN)
-    requiered: boolean;
+    required: boolean;
 
     @AllowNull(false)
     @Column(DataType.BOOLEAN)
